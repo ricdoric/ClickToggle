@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <VINTAGE_STORY_NET8>/path/to/vintagestory121</VINTAGE_STORY_NET8>
+    <VINTAGE_STORY_NET10>/path/to/vintagestory122</VINTAGE_STORY_NET10>
+  </PropertyGroup>
+</Project>
