@@ -3,8 +3,8 @@
   "modid": "clicktoggle",
   "name": "ClickToggle",
   "authors": ["Litric"],
-  "description": "Toggle auto left-click with hotkey N",
-  "version": "1.0.0",
+  "description": "Toggle auto left-click with hotkey (default N)",
+  "version": "1.0.3",
   "dependencies": {
   }
 }
