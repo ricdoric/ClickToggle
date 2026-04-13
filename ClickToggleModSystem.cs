@@ -7,6 +7,7 @@ public class ClickToggleModSystem : ModSystem
 {
     private ICoreClientAPI Api;
     private bool autoClickEnabled = false;
+    private bool isRightClick = false;
     private static bool _debug = false;
 
     public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Client;
@@ -23,7 +24,16 @@ public class ClickToggleModSystem : ModSystem
             type: HotkeyType.CharacterControls
         );
 
+        Api.Input.RegisterHotKey(
+            hotkeyCode: "autoClickToggleRight",
+            name: "(ClickToggle) Toggle auto-right-click",
+            key: GlKeys.N,
+            type: HotkeyType.CharacterControls,
+            shiftPressed: true
+        );
+
         Api.Input.SetHotKeyHandler("autoClickToggle", OnToggleAutoClick);
+        Api.Input.SetHotKeyHandler("autoClickToggleRight", OnToggleAutoClickRight);
 
         Api.Event.RegisterGameTickListener(OnGameTick, 0);
 
@@ -36,21 +46,42 @@ public class ClickToggleModSystem : ModSystem
 
         // Cancel auto clicking if user manually clicks mouseleft
         Api.Event.MouseDown += OnMouseDown;
+        Api.Event.KeyDown += OnKeyDown;
     }
 
     private bool OnToggleAutoClick(KeyCombination kc)
     {
         autoClickEnabled = !autoClickEnabled;
+        isRightClick = false;
 
         if (autoClickEnabled)
         {
-            DebugMessage("ClickToggle enabled via hotkey.");
+            DebugMessage("ClickToggle left click enabled via hotkey.");
         }
         else
         {
             // Ensure mouse button is released when disabling
             ReleaseMouseButton();
-            DebugMessage("ClickToggle disabled via hotkey.");
+            DebugMessage("ClickToggle left click disabled via hotkey.");
+        }
+
+        return true;
+    }
+
+    private bool OnToggleAutoClickRight(KeyCombination kc)
+    {
+        autoClickEnabled = !autoClickEnabled;
+        isRightClick = true;
+
+        if (autoClickEnabled)
+        {
+            DebugMessage("ClickToggle right click enabled via hotkey.");
+        }
+        else
+        {
+            // Ensure mouse button is released when disabling
+            ReleaseMouseButton();
+            DebugMessage("ClickToggle right click disabled via hotkey.");
         }
 
         return true;
@@ -59,11 +90,24 @@ public class ClickToggleModSystem : ModSystem
     private void OnMouseDown(MouseEvent e)
     {
         if (!autoClickEnabled) return;
-        if (e.Button == EnumMouseButton.Left)
+        if (e.Button == EnumMouseButton.Left || e.Button == EnumMouseButton.Right)
         {
             autoClickEnabled = false;
+            isRightClick = false;
             ReleaseMouseButton();
-            DebugMessage("ClickToggle disabled via manual left-click.");
+            DebugMessage("ClickToggle disabled via manual mouse click.");
+        }
+    }
+
+    private void OnKeyDown(KeyEvent e)
+    {
+        if (!autoClickEnabled) return;
+        if (e.KeyCode == (int)GlKeys.Escape)
+        {
+            autoClickEnabled = false;
+            isRightClick = false;
+            ReleaseMouseButton();
+            DebugMessage("ClickToggle disabled via escape key.");
         }
     }
 
@@ -71,8 +115,15 @@ public class ClickToggleModSystem : ModSystem
     {
         if (!autoClickEnabled) return;
 
-        // Emulate holding down left mouse button by triggering the mouse button down event each tick
-        Api.Input.InWorldMouseButton.Left = true;
+        // Emulate holding down left or right mouse button by triggering the mouse button down event each tick
+        if (isRightClick)
+        {
+            Api.Input.InWorldMouseButton.Right = true;
+        }
+        else
+        {
+            Api.Input.InWorldMouseButton.Left = true;
+        }
     }
 
     private void ReleaseMouseButton()
@@ -80,6 +131,8 @@ public class ClickToggleModSystem : ModSystem
         if (Api?.Input?.InWorldMouseButton != null)
         {
             Api.Input.InWorldMouseButton.Left = false;
+            Api.Input.InWorldMouseButton.Right = false;
+            isRightClick = false;
         }
     }
 
@@ -92,7 +145,10 @@ public class ClickToggleModSystem : ModSystem
         }
 
         if (Api != null)
+        {
             Api.Event.MouseDown -= OnMouseDown;
+            Api.Event.KeyDown -= OnKeyDown;
+        }
 
         base.Dispose();
     }
