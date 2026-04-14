@@ -32,8 +32,8 @@ public class ClickToggleModSystem : ModSystem
             shiftPressed: true
         );
 
-        Api.Input.SetHotKeyHandler("autoClickToggle", OnToggleAutoClick);
-        Api.Input.SetHotKeyHandler("autoClickToggleRight", OnToggleAutoClickRight);
+        Api.Input.SetHotKeyHandler("autoClickToggle", OnHotkeyClickToggleLeft);
+        Api.Input.SetHotKeyHandler("autoClickToggleRight", OnHotkeyClickToggleRight);
 
         Api.Event.RegisterGameTickListener(OnGameTick, 0);
 
@@ -44,12 +44,12 @@ public class ClickToggleModSystem : ModSystem
                 .HandleWith(OnDebugCommand)
             .EndSubCommand();
 
-        // Cancel auto clicking if user manually clicks mouseleft
+        // Cancel auto clicking if user manually clicks mouseleft or mouseright
         Api.Event.MouseDown += OnMouseDown;
         Api.Event.KeyDown += OnKeyDown;
     }
 
-    private bool OnToggleAutoClick(KeyCombination kc)
+    private bool OnHotkeyClickToggleLeft(KeyCombination kc)
     {
         autoClickEnabled = !autoClickEnabled;
         isRightClick = false;
@@ -68,7 +68,7 @@ public class ClickToggleModSystem : ModSystem
         return true;
     }
 
-    private bool OnToggleAutoClickRight(KeyCombination kc)
+    private bool OnHotkeyClickToggleRight(KeyCombination kc)
     {
         autoClickEnabled = !autoClickEnabled;
         isRightClick = true;
