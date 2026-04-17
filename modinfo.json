@@ -1,10 +1,12 @@
 {
   "type": "code",
+  "side": "Client",
   "modid": "clicktoggle",
   "name": "ClickToggle",
   "authors": ["Litric"],
-  "description": "Toggle auto left-click with hotkey (default N)",
-  "version": "1.1.0",
+  "description": "Toggle auto clicking mouse buttons, default hotkeys: (N = left) (Shift+N = right)",
+  "version": "1.1.1",
   "dependencies": {
+    "game": "1.22.0-rc.1"
   }
 }

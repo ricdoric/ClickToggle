@@ -132,10 +132,10 @@
     <MakeDir Directories="$(_StageDir)" />
     <Copy SourceFiles="@(_PackFiles)" DestinationFolder="$(_StageDir)" />
 
-    <!-- For net8, patch modid in the staged modinfo.json -->
+    <!-- For net8, patch modid and dependencies.game in the staged modinfo.json -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
       <_StagedModInfo>$(_StageDir)modinfo.json</_StagedModInfo>
-      <_PatchedContent>$([System.IO.File]::ReadAllText($(_StagedModInfo)).Replace('"modid": "$(_ModId)"', '"modid": "$(_ModId)net8"'))</_PatchedContent>
+      <_PatchedContent>$([System.Text.RegularExpressions.Regex]::Replace($([System.IO.File]::ReadAllText($(_StagedModInfo)).Replace('"modid": "$(_ModId)"', '"modid": "$(_ModId)net8"')), '"game"\s*:\s*"[^"]+"', '"game": "1.21.0-rc.1"'))</_PatchedContent>
     </PropertyGroup>
     <WriteLinesToFile
       Condition="'$(TargetFramework)' == 'net8.0'"
